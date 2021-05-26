@@ -25,7 +25,11 @@ const Item = new Schema({
     },
     role: {
         type: String,
-        required: false
+        required: true
+    },
+    visibility: {
+        type: Boolean,
+        required: true
     }
 
 }, {
