@@ -9,10 +9,12 @@ router.post('/new', [body('title').isLength({max: 48, min: 8}).withMessage('Inpu
 
 router.get('/all', itemController.getAllItems)
 
-router.get('/id', itemController.getItemsById)
+router.get('/all/filter', itemController.getFilteredItems)
 
-router.put('/update', itemController.updateItemById)
+router.get('/view/:itemId', itemController.getItemsById)
 
-router.post('/unlist', itemController.removeItem)
+router.put('/view/:itemId', [body('title').isLength({max: 48, min: 8}).withMessage('Input length mismatch!')], itemController.updateItemById)
+
+router.put('/view/:itemId', itemController.removeItem)
 
 module.exports = router;

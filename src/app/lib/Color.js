@@ -42,6 +42,15 @@ exports.success = (message, method) => {
     } else console.log(this.Color.fg.green+"OK\t"+this.Color.reset+message)
 }
 
+exports.info = (message, method) => {
+    if(method) {
+        if(method === 'get' ||
+        method === 'post' ||
+        method === 'put' ||
+        method === 'delete') console.log(this.Color.fg.cyan+"WARN\t"+this.Color.fg.cyan+method.toUpperCase()+"\t"+this.Color.reset+message)
+    } else console.log(this.Color.fg.cyan+"INFO\t"+this.Color.reset+message)
+}
+
 exports.warn = (message, method) => {
     if(method) {
         if(method === 'get' ||

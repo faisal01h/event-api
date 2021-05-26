@@ -8,11 +8,11 @@ const Item = new Schema({
         required: true
     },
     tingkatan: {
-        type: Object,
+        type: String,
         required: true
     },
     daerah: {
-        type: Object,
+        type: String,
         required: true
     },
     description: {

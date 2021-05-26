@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const { json } = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
+const path = require('path')
 const clr = require('./src/app/lib/Color');
 require('dotenv').config();
 
@@ -22,6 +23,20 @@ app.use(session({
     saveUninitialized: false,
     secret: 'securesession'
 }))
+
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+    res.setHeader("Access-Control-Allow-Headers", "Content-type, Authorization");
+    next();
+});
+
+app.use("./src/resources/media", express.static(path.join(__dirname, "images")));
+app.use("./src/resources/js", express.static(path.join(__dirname, "js")));
+app.use("./src/resources/css", express.static(path.join(__dirname, "css")));
 
 //Routes
 const itemRoutes = require('./src/app/routes/items')

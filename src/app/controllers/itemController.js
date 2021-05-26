@@ -1,73 +1,23 @@
-const { validationResult } = require('express-validator')
+const { validationResult, query } = require('express-validator')
 const Item = require('../models/item')
 
 const clr = require('../lib/Color')
 
 exports.getAllItems = (req, res, next) => {
-    clr.success(new Date()+": Served getAllItems", 'get')
-    res.json({
-        status: 200,
-        content: [
-            {
-                id: 1,
-                image: "http://www.imageurl.com/image.jpg",
-                title: "Seminar A",
-                tingkatan: {
-                    SD: true,
-                    SMP: true,
-                    SMA: true,
-                    MHS: true,
-                    UMUM: true
-                },
-                daerah: {
-                    Provinsi: "all",
-                    Kabkot: "all",
-                    Kecamatan: "all",
-                },
-                description: {
-                    desc: "Ikuti seminar a",
-                    rewards: null,
-                }
-            },
-            {
-                id: 2,
-                image: "http://www.imageurl.com/image.jpg",
-                title: "Kompetisi A",
-                tingkatan: {
-                    SD: false,
-                    SMP: false,
-                    SMA: true,
-                    MHS: true,
-                    UMUM: false
-                },
-                daerah: {
-                    Provinsi: [
-                        "Jawa Timur"
-                    ],
-                    Kabkot: [
-                        "Surabaya",
-                        "Sidoarjo"
-                    ],
-                    Kecamatan: "all",
-                },
-                description: {
-                    desc: "Ikuti kompetisi a",
-                    rewards: {
-                        1: {
-                            uang: 1000000,
-                            sertifikat: true,
-                            misc: "Pengalaman"
-                        },
-                        2: {
-                            uang: 700000,
-                            sertifikat: true,
-                            misc: "Pengalaman"
-                        },
-                    },
-                }
-            },
-
-        ]
+    var total;
+    Item.countDocuments().then(result => {total = result}).catch(err => {clr.fail(err)})
+    Item.find()
+    .then(result => {
+        res.status(200).json({
+            status: 200,
+            count: total,
+            data: result
+        })
+        clr.success(new Date()+": Served getAllItems", 'get')
+    })
+    .catch(err => {
+        clr.fail(new Date()+": Cannot serve getAllItems", 'get')
+        clr.fail(err)
     })
 }
 
@@ -86,11 +36,10 @@ exports.createItem = (req, res, next) => {
         throw err;
     } else {
         // All clear
-        let itemId = 1;
+        let itemId = 2;
         let authorId = 1;
         let visible = (1 === 1)
         const newItemListing = new Item({
-            id: itemId,
             title: title,
             tingkatan: tingkatan,
             daerah: daerah,
@@ -116,25 +65,129 @@ exports.createItem = (req, res, next) => {
             clr.fail(new Date()+": Item "+itemId+" by "+authorId+" failed to post", 'post')
             clr.fail(err)
             res.status(400).json(err)
-        })
-
-        
+            next()
+        })  
     }
 
     
 }
 
 exports.getItemsById = (req, res, next) => {
-    clr.success(new Date()+": Served item ID "+req.body.id)
-    res.sendStatus(200);
+    const itemId = req.params.itemId;
+    //Item.findOne({id: itemId})
+    Item.findById(itemId)
+    .then( result => {
+        if(!result) {
+            const err = new Error('Item not found')
+            err.errorStatus(404)
+            throw err
+        
+        } else {
+            res.status(500).json({
+                status: 200,
+                data: result
+            })
+            clr.success(new Date()+": Served item ID "+itemId)
+        }
+        
+        
+    })
+    .catch(err => {
+        clr.fail("Cannot serve item "+itemId, 'get')
+        clr.fail(err)
+    })
+
+    
+}
+
+exports.getFilteredItems = (req, res, next) => {
+    /*
+    req body
+    {
+        "title": string or undefined
+        "tingkatan": string or undefined
+        "daerah": string or undefined
+        "jenis": string "event"/"lomba"/"seminar" or undefined
+    }
+    */
+    var query = {};
+    if(req.body.title) query.title = { $regex: req.body.title };
+    if(req.body.tingkatan) query.tingkatan = { $regex: req.body.tingkatan };
+    if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
+    if(req.body.jenis) query.jenis = { $regex: req.body.jenis };
+    
+    clr.info(query);
+
+    Item.find(query)
+    .then( result => {
+        if(!result) {
+            const err = new Error('Item not found')
+            err.errorStatus(404)
+            throw err
+        
+        } else {
+            res.status(200).json({
+                status: 200,
+                query: query,
+                data: result
+            })
+            clr.success(new Date()+": Served getFilteredItems", 'get')
+        }
+    })
+    .catch(err => {
+        clr.fail("Cannot serve item ", 'get')
+        clr.fail(err)
+    })
+
+    
 }
 
 exports.updateItemById = (req, res, next) => {
-    clr.success(new Date()+": Updated item ID "+req.body.id)
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        clr.fail("Error on itemController:createItem", 'post')
+        const err = new Error('Invalid value');
+        err.errorStatus = 400;
+        err.data = errors.array()
+        throw err;
+    } else {
+        // All clear
+        const title = req.body.title;
+        const tingkatan = req.body.tingkatan;
+        const daerah = req.body.daerah;
+        const description = req.body.description;
+        const itemId = req.params.itemId;
+
+        Item.findById(itemId)
+        .then(item => {
+            if(!item) {
+                const err = new Error('Item not found');
+                err.errorStatus(404);
+                throw err;
+            } else {
+                item.title = title;
+                item.tingkatan = tingkatan;
+                item.daerah = daerah;
+                item.description = description;
+
+                return item.save();
+                
+            }
+        })
+        .then(result => {
+            res.status(200).json({
+                status: 200,
+                itemId: itemId,
+                message: "Updated"
+            })
+        })
+        .catch()
+    }
+    clr.success(new Date()+": Updated item ID "+req.body.itemId)
     res.sendStatus(200);
 }
 
 exports.removeItem = (req, res, next) => {
-    clr.warn(new Date()+": Item ID "+req.body.id+" marked as removed", 'post')
+    clr.warn(new Date()+": Item ID "+req.body.itemId+" marked as removed", 'put')
     res.json(req.body);
 }
