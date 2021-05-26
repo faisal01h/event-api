@@ -15,6 +15,6 @@ router.get('/view/:itemId', itemController.getItemsById)
 
 router.put('/view/:itemId', [body('title').isLength({max: 48, min: 8}).withMessage('Input length mismatch!')], itemController.updateItemById)
 
-router.put('/view/:itemId', itemController.removeItem)
+router.put('/unlist/:itemId', itemController.removeItem)
 
 module.exports = router;

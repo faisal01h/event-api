@@ -184,10 +184,33 @@ exports.updateItemById = (req, res, next) => {
         .catch()
     }
     clr.success(new Date()+": Updated item ID "+req.body.itemId)
-    res.sendStatus(200);
 }
 
 exports.removeItem = (req, res, next) => {
-    clr.warn(new Date()+": Item ID "+req.body.itemId+" marked as removed", 'put')
-    res.json(req.body);
+    const itemId = req.params.itemId;
+
+    Item.findById(itemId)
+    .then(item => {
+        if(!item) {
+            const err = new Error('Item not found');
+            err.errorStatus(404);
+            throw err;
+        } else {
+            item.visibility = false;
+            return item.save();
+        }
+    })
+    .then(result => {
+        res.status(200).json({
+            status: 200,
+            itemId: itemId,
+            message: "'Removed'"
+        })
+        clr.warn(new Date()+": Item ID "+itemId+" marked as removed", 'put')
+    })
+    .catch(err => {
+        clr.fail("Cannot mark item "+itemId+" as removed", 'put')
+        clr.fail(err)
+    })
+    
 }
