@@ -1,5 +1,4 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const { json } = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
@@ -10,6 +9,7 @@ require('dotenv').config();
 const SESSION_LIFETIME = 1000*60*60*12; // 12 hours
 const PORT = process.env.PORT || 80;
 const MONGO_SRV = process.env.MONGO_DB_DSN || undefined;
+
 const app = express();
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());

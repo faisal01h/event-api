@@ -1,7 +1,78 @@
 const { validationResult, query } = require('express-validator')
+const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
 const clr = require('../lib/Color')
+
+const SALTROUNDS = process.env.BCRYPT_SALROUNDS || 10;
+
+/*
+* Register endpoint handler
+* @route POST api/v1/auth/register
+* @access Public
+*/
+exports.register = (req, res, next) => {
+    const err = validationResult(req);
+    if(!err.isEmpty()) {
+        clr.fail("Error creating new account", 'post')
+        const err = new Error('Invalid value');
+        err.errorStatus = 400;
+        err.data = errors.array()
+        throw err;
+    } else {
+        const email = req.body.email;
+        const name = req.body.name;
+        const password = req.body.password;
+
+        if(!email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+            clr.warn("Register: Email address "+email+" is invalid!");
+            res.status(400).json({
+                status: 400,
+                message: "Email does not pass regex check"
+            })
+            next()
+        } else clr.info(email+": Regex passing...", 'post')
+
+        User.findOne({ email: email })
+        .then(userExist => {
+            if(userExist) {
+                const err = new Error('User with email '+email+' already exists!');
+                err.errorStatus = 400;
+                throw err;
+            } else {
+                const defaultRole = "user";
+                bcrypt.hash(password, SALTROUNDS, (err, hash) => {
+                    const hashedPasswd = hash;
+                    clr.info(hashedPasswd)
+
+                    const newUser = new User({
+                        name: name,
+                        email: email,
+                        password: hashedPasswd,
+                        role: defaultRole,
+                        visibility: true
+                    })
+
+                    newUser.save()
+                    .then(result => {
+                        res.status(201).json({
+                            status: 201,
+                            message: defaultRole+" "+email+" created successfully!",
+                            data: {
+                                name: name,
+                                email: email,
+                                role: defaultRole
+                            }
+                        })
+                        clr.success(new Date()+": Created "+defaultRole+" "+email+" ("+name+") ", 'post')
+                    })
+                    .catch(err=>{clr.fail(err)})
+                })
+            }
+        })
+        .catch(err=>{clr.fail(err)})
+    }
+}
 
 exports.getAllUsers = (req, res, next) => {
     var total;
