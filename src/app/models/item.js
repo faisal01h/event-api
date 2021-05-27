@@ -20,7 +20,7 @@ const Item = new Schema({
         required: true
     },
     authorId: {
-        type: Number,
+        type: String,
         required: true
     },
     visibility: {
