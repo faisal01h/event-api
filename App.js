@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const SESSION_LIFETIME = 1000*60*60*12; // 12 hours
 const PORT = process.env.PORT || 80;
-const MONGO_SRV = process.env.MONGO_DB_DSN || "mongodb+srv://system:pWe5%40C2%23yraQgqGXEL@event.x54n9.mongodb.net/event?retryWrites=true&w=majority";
+const MONGO_SRV = process.env.MONGO_DB_DSN || undefined;
 const app = express();
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
