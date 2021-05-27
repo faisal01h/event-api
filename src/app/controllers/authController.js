@@ -75,6 +75,9 @@ exports.register = (req, res, next) => {
 }
 
 exports.getAllUsers = (req, res, next) => {
+    /*
+    *   TBD: Redact password from query
+    */
     var total;
     User.countDocuments().then(result => {total = result}).catch(err => {clr.fail(err)})
     User.find()
@@ -90,4 +93,21 @@ exports.getAllUsers = (req, res, next) => {
         clr.fail(new Date()+": Cannot serve getAllUsers", 'get')
         clr.fail(err)
     })
+}
+
+exports.getUserInfo = (req, res, next) => {
+    /*
+    *   TBD: Redact password from query
+    */
+    var query = {}
+    if(req.body.email) query.email = req.body.email;
+    if(req.body.name) query.name = {$regex: req.body.name};
+    User.find(query)
+    .then(result => {
+        res.status(200).json({
+            status: 200,
+            data: result
+        })
+    })
+    .catch()
 }
