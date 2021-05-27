@@ -180,10 +180,14 @@ exports.updateItemById = (req, res, next) => {
                 itemId: itemId,
                 message: "Updated"
             })
+            clr.success(new Date()+": Updated item ID "+itemId)
         })
-        .catch()
+        .catch(err => {
+            clr.fail("Cannot update item "+itemId, 'put')
+            clr.fail(err)
+        })
     }
-    clr.success(new Date()+": Updated item ID "+req.body.itemId)
+    
 }
 
 exports.removeItem = (req, res, next) => {
