@@ -21,6 +21,24 @@ exports.getAllItems = (req, res, next) => {
     })
 }
 
+exports.getAllVisibleItems = (req, res, next) => {
+    var total;
+    Item.countDocuments({visibility: true}).then(result => {total = result}).catch(err => {clr.fail(err)})
+    Item.find({visibility: true})
+    .then(result => {
+        res.status(200).json({
+            status: 200,
+            count: total,
+            data: result
+        })
+        clr.success(new Date()+": Served getAllVisibleItems", 'get')
+    })
+    .catch(err => {
+        clr.fail(new Date()+": Cannot serve getAllVisibleItems", 'get')
+        clr.fail(err)
+    })
+}
+
 exports.createItem = (req, res, next) => {
     const title = req.body.title;
     const tingkatan = req.body.tingkatan;

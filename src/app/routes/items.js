@@ -9,6 +9,8 @@ router.post('/new', [body('title').isLength({max: 48, min: 8}).withMessage('Inpu
 
 router.get('/all', itemController.getAllItems)
 
+router.get('/all/visible', itemController.getAllVisibleItems)
+
 router.get('/all/filter', itemController.getFilteredItems)
 
 router.get('/view/:itemId', itemController.getItemsById)
