@@ -18,7 +18,7 @@ app.use(express.json());
 // Multer - Process image requests
 const itemImgStor = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './src/resources/media/itemimg');
+        cb(null, './src/resources/media/item');
     },
     filename: (req, file, cb) => {
         cb(null, "ITEM"+new Date().getTime()+"_"+file.originalname)
@@ -50,9 +50,9 @@ app.use((req, res, next) => {
 });
 
 // Publicly accessible static files
-app.use("./src/resources/media", express.static(path.join(__dirname, "images")));
-app.use("./src/resources/js", express.static(path.join(__dirname, "js")));
-app.use("./src/resources/css", express.static(path.join(__dirname, "css")));
+app.use("/images", express.static(path.join(__dirname, "src/resources/media")));
+app.use("/js", express.static(path.join(__dirname, "src/resources/js")));
+app.use("/css", express.static(path.join(__dirname, "src/resources/css")));
 
 // Init passport
 app.use(passport.initialize());
