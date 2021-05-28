@@ -1,9 +1,10 @@
 const express = require('express');
 const { json } = require('express');
-const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path')
+const passport = require('passport')
 const clr = require('./src/app/lib/Color');
+require("./src/app/middleware/Passport")(passport);
 require('dotenv').config();
 
 const SESSION_LIFETIME = 1000*60*60*12; // 12 hours
@@ -13,16 +14,6 @@ const MONGO_SRV = process.env.MONGO_DB_DSN || undefined;
 const app = express();
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-
-app.use(session({
-    name: 'sessid',
-    cookie : {
-        maxAge: SESSION_LIFETIME,
-    },
-    resave: false,
-    saveUninitialized: false,
-    secret: 'securesession'
-}))
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -37,6 +28,8 @@ app.use((req, res, next) => {
 app.use("./src/resources/media", express.static(path.join(__dirname, "images")));
 app.use("./src/resources/js", express.static(path.join(__dirname, "js")));
 app.use("./src/resources/css", express.static(path.join(__dirname, "css")));
+
+app.use(passport.initialize());
 
 //Routes
 const itemRoutes = require('./src/app/routes/items')

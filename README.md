@@ -1,4 +1,8 @@
-# API responses
+# Promotin
+
+[![Repository version](https://img.shields.io/badge/version-0.0.2-brightred)](https://github.com/faisal01h/event-api)
+
+## API responses
 
 ### Item model standard response
 `Content-Type: application/json`

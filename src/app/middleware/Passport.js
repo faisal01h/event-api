@@ -1,6 +1,7 @@
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require('../models/user');
+const clr = require('../lib/Color')
 
 const secretOrKey = process.env.KEY || "confidential";
 
@@ -14,6 +15,7 @@ module.exports = (passport) => {
       User.findById(jwt_payload._id)
         .then((user) => {
           if (user) {
+            clr.success("Triggered"+clr.Color.fg.cyan+" PASSPORT"+clr.Color.reset);
             return done(null, user);
           }
           return done(null, false);
