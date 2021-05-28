@@ -21,7 +21,7 @@ const itemImgStor = multer.diskStorage({
         cb(null, './src/resources/media/itemimg');
     },
     filename: (req, file, cb) => {
-        cb(null, "ITEM"+new Date().toString()+"_"+file.originalname)
+        cb(null, "ITEM"+new Date().getTime()+"_"+file.originalname)
     }
 });
 
