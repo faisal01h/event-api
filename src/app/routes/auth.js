@@ -3,10 +3,12 @@ const router = express.Router()
 
 const authenticationController = require('../controllers/authController')
 
-router.get('/all', authenticationController.getAllUsers)
+router.get('user/all', authenticationController.getAllUsers)
 
-router.get('/find', authenticationController.getUserInfo)
+router.get('user/find', authenticationController.getUserInfo)
 
 router.post('/register', authenticationController.register)
+
+router.post('/login', authenticationController.login)
 
 module.exports = router

@@ -1,10 +1,12 @@
 const { validationResult, query } = require('express-validator')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const jwt = require ('jsonwebtoken')
 
 const clr = require('../lib/Color')
 
 const SALTROUNDS = process.env.BCRYPT_SALROUNDS || 10;
+const secretOrKey = process.env.KEY || "confidential";
 
 /*
 * Register endpoint handler
@@ -41,36 +43,98 @@ exports.register = (req, res, next) => {
                 throw err;
             } else {
                 const defaultRole = "user";
-                bcrypt.hash(password, SALTROUNDS, (err, hash) => {
-                    const hashedPasswd = hash;
-                    clr.info(hashedPasswd)
-
-                    const newUser = new User({
-                        name: name,
-                        email: email,
-                        password: hashedPasswd,
-                        role: defaultRole,
-                        visibility: true
-                    })
-
-                    newUser.save()
-                    .then(result => {
-                        res.status(201).json({
-                            status: 201,
-                            message: defaultRole+" "+email+" created successfully!",
-                            data: {
-                                name: name,
-                                email: email,
-                                role: defaultRole
-                            }
+                bcrypt.genSalt(SALTROUNDS, (err, salt) => {
+                    bcrypt.hash(password, salt, (err, hash) => {
+                        const hashedPasswd = hash;
+                        clr.info(hashedPasswd)
+    
+                        const newUser = new User({
+                            name: name,
+                            email: email,
+                            password: hashedPasswd,
+                            role: defaultRole,
+                            visibility: true
                         })
-                        clr.success(new Date()+": Created "+defaultRole+" "+email+" ("+name+") ", 'post')
+    
+                        newUser.save()
+                        .then(result => {
+                            res.status(201).json({
+                                status: 201,
+                                message: defaultRole+" "+email+" created successfully!",
+                                data: {
+                                    name: name,
+                                    email: email,
+                                    role: defaultRole
+                                }
+                            })
+                            clr.success(new Date()+": Created "+defaultRole+" "+email+" ("+name+") ", 'post')
+                        })
+                        .catch(err=>{clr.fail(err)})
                     })
-                    .catch(err=>{clr.fail(err)})
                 })
             }
         })
         .catch(err=>{clr.fail(err)})
+    }
+}
+
+exports.login = (req, res, next) => {
+    const err = validationResult(req);
+    if(!err.isEmpty()) {
+        clr.fail("Error logging in", 'post')
+        const err = new Error('Invalid value');
+        err.errorStatus = 400;
+        err.data = errors.array()
+        throw err;
+    } else {
+        const email = req.body.email;
+        const password = req.body.password;
+        User.findOne({ email: email })
+        .then((found) => {
+            if(!found) {
+                const err = new Error('Forbidden');
+                err.errorStatus = 403;
+                throw err;
+            } else {
+                bcrypt.compare(password, found.password)
+                .then((pwdMatch) => {
+                    if(!pwdMatch) {
+                        const err = new Error('Forbidden');
+                        err.errorStatus = 403;
+                        throw err;
+                    } else {
+                        const data = {
+                            id: found._id,
+                            name: found.name,
+                            email: found.email
+                        }
+
+                        jwt.sign(
+                            data,
+                            secretOrKey,
+                            {
+                                expiresIn: 43200
+                            },
+                            (err, token) => {
+                                res.json({
+                                    token: token
+                                })
+                            }
+                        )
+
+                        clr.success(new Date()+": "+found.email+" logged in ", 'post');
+
+                        
+                    }
+                })
+                .catch(err => {
+                    clr.fail(err)
+                })
+            }
+        })
+        .catch(err => {
+            clr.fail(err)
+        })
     }
 }
 
