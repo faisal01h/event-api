@@ -54,11 +54,22 @@ exports.createItem = (req, res, next) => {
         throw err;
     } else {
         // All clear
+
+        if(!req.file) {
+            clr.fail("Empty image request received on itemController:createItem", 'post')
+            const err = new Error('Bad request');
+            err.errorStatus = 400;
+            err.data = errors.array()
+            throw err;
+        }
+
+        const image = req.file.path;
         let itemId = 2;
         let authorId = 1;
         let visible = (1 === 1)
         const newItemListing = new Item({
             title: title,
+            imageURI: image,
             tingkatan: tingkatan,
             daerah: daerah,
             description: description,

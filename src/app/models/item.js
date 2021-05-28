@@ -7,6 +7,10 @@ const Item = new Schema({
         type: String,
         required: true
     },
+    imageURI: {
+        type: String,
+        required: false
+    },
     tingkatan: {
         type: String,
         required: true
