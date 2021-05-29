@@ -3,17 +3,40 @@ const { json } = require('express');
 const mongoose = require('mongoose');
 const path = require('path')
 const passport = require('passport')
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 const multer = require('multer')
 const clr = require('./src/app/lib/Color');
-require("./src/app/middleware/Passport")(passport); // Passport strategy
 require('dotenv').config(); // Read .env
 
 const PORT = process.env.PORT || 80;
 const MONGO_SRV = process.env.MONGO_DB_DSN || undefined;
+const secretOrKey = process.env.KEY || "confidential";
 
 const app = express();
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+
+// Init passport
+app.use(passport.initialize())
+const opts = {};
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = secretOrKey;
+
+passport.use(
+    new JwtStrategy(opts, (jwt_payload, done) => {
+        require('./src/app/models/user').findById(jwt_payload.id)
+        .then((user) => {
+            if (user) {
+                //clr.success("Passport "+user+"/"+jwt_payload.id+clr.Color.fg.cyan+" approved!"+clr.Color.reset);
+                return done(null, user);
+            }
+            return done(null, false);
+        })
+        .catch((err) => clr.fail(err));
+    })
+);
+
 
 // Multer - Process image requests
 const itemImgStor = multer.diskStorage({
@@ -53,9 +76,6 @@ app.use((req, res, next) => {
 app.use("/images", express.static(path.join(__dirname, "src/resources/media")));
 app.use("/js", express.static(path.join(__dirname, "src/resources/js")));
 app.use("/css", express.static(path.join(__dirname, "src/resources/css")));
-
-// Init passport
-app.use(passport.initialize());
 
 //Routes
 const itemRoutes = require('./src/app/routes/items')

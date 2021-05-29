@@ -117,7 +117,7 @@ exports.login = (req, res, next) => {
                             },
                             (err, token) => {
                                 res.json({
-                                    token: token,
+                                    token: "Bearer "+token,
                                     data
                                 })
                             }
