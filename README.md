@@ -2,6 +2,20 @@
 
 [![Repository version](https://img.shields.io/badge/version-0.0.2-brightred)](https://github.com/faisal01h/event-api)
 
+## Implementation
+
+### API Endpoints
+- GET `<host>:<port>/api/v1/items/all` : Show all item listings
+- GET `<host>:<port>/api/v1/items/filtered` : Show filtered listings specified in request body
+- GET `<host>:<port>/api/v1/items/paginated?page&perPage` : Shows paginated item listings
+- POST `<host>:<port>/api/v1/items/new` : Post new item with details specified in request body
+- GET `<host>:<port>/api/v1/items/view/:id` : Show item with the given ID
+- PUT `<host>:<port>/api/v1/items/view/:id` : Updates the item with the given ID providing the user has sufficient privileges. Request header must contain Authorization with value bearer token.
+- PUT `<host>:<port>/api/v1/items/unlist/:id` : Delete item with the given ID providing the user has sufficient privileges. Request header must contain Authorization with value bearer token.
+
+- POST `<host>:<port>/api/v1/auth/login` : Login endpoint, returns bearer token.
+- POST `<host>:<port>/api/v1/auth/register` : Register endpoint
+
 ## API responses
 
 ### Item model standard response
