@@ -19,20 +19,30 @@
             "prize": {
                 "1": {
                     "uang": 1000000,
-                    "Sertifikat": "String with value Ya/Tidak, optional",
+                    "sertifikat": "String with value Ya/Tidak, optional",
                     "lainnya": "optional"
                 },
                 "2": {
                     "uang": 700000,
-                    "Sertifikat": "String with value Ya/Tidak, optional",
+                    "sertifikat": "String with value Ya/Tidak, optional",
                     "lainnya": "optional"
                 }
             },
             "benefits": {
                 "konsumsi": "optional",
-                "serifikat": "String with value Ya/Tidak, optional",
+                "sertifikat": "String with value Ya/Tidak, optional",
                 "lainnya": "optional"
-            }
+            },
+            "alur": [
+                {
+                    "date": Date,
+                    "desc": "String"
+                },
+                {
+                    "date": Date,
+                    "desc": "String"
+                }
+            ]
         }
     },
     "authorId": "60x729hq2example",
