@@ -150,7 +150,7 @@ exports.getItemsById = (req, res, next) => {
             throw err
         
         } else {
-            res.status(500).json({
+            res.status(200).json({
                 status: 200,
                 data: result
             })

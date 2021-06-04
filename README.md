@@ -67,3 +67,7 @@
 }
 
 ```
+
+## Verbose logging
+
+Delete all lines with `clr` and `./src/app/lib/Color` references to remove all logging to server console.
