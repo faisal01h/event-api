@@ -92,22 +92,10 @@ exports.createItem = (req, res, next) => {
         throw err;
     } else {
         // All clear
-
-        if(!req.file) {
-            clr.fail("Empty image request received on itemController:createItem", 'post')
-            const err = new Error('Bad request');
-            err.errorStatus = 400;
-            err.data = errors.array()
-            throw err;
-        }
-
-        const image = req.file.path;
-        let itemId = 2;
         let authorId = 1;
         let visible = (1 === 1)
         const newItemListing = new Item({
             title: title,
-            imageURI: image,
             tingkatan: tingkatan,
             daerah: daerah,
             description: description,
@@ -117,11 +105,11 @@ exports.createItem = (req, res, next) => {
 
         newItemListing.save()
         .then(result => {
-            clr.success(new Date()+": Item "+itemId+" by "+authorId+" created", 'post')
+            clr.success(new Date()+": Item "+result.id+" by "+authorId+" created", 'post')
             res.status(201).json({
                 status: 201,
                 data: {
-                    itemId: itemId,
+                    itemId: result.id,
                     itemAuthor: authorId,
                     itemStatus: "Posted",
                     isItemVisible: visible
@@ -129,7 +117,7 @@ exports.createItem = (req, res, next) => {
             });
         })
         .catch(err => {
-            clr.fail(new Date()+": Item "+itemId+" by "+authorId+" failed to post", 'post')
+            clr.fail(new Date()+": Item failed to post", 'post')
             clr.fail(err)
             res.status(400).json(err)
             next()
@@ -137,6 +125,58 @@ exports.createItem = (req, res, next) => {
     }
 
     
+}
+
+exports.addImageData = (req, res, next) => {
+    const itemId = req.body.itemId;
+
+    if(!req.file) {
+        clr.fail("Empty image request received on itemController:createItem", 'post')
+        const err = new Error('Bad request');
+        err.errorStatus = 400;
+        err.data = errors.array()
+        throw err;
+    }
+
+    const image = req.file.path;
+
+    Item.findById(itemId)
+        .then(item => {
+            if(!item) {
+                const err = new Error('Item not found');
+                err.errorStatus(404);
+                throw err;
+            } else {
+                passport.authenticate('jwt', {session:false}, (err, user)=> {
+                    if(user.id === item.authorId) {
+                        item.imageURI = image;
+
+                        return item.save()
+                        .then(result => {
+                            res.status(200).json({
+                                status: 200,
+                                itemId: item.id,
+                                path: image,
+                                message: "Updated"
+                            })
+                            clr.success(new Date()+": Image added on item ID "+itemId)
+                            
+                        })
+                    } else {
+                        res.status(403).json({status:403})
+                        return 403;
+                    }
+                }) (req, res, next)
+                
+                
+            }
+        })
+        
+        .catch(err => {
+            clr.fail("Cannot update item "+itemId, 'put')
+            clr.fail(err)
+            res.json(err)
+        })
 }
 
 exports.getItemsById = (req, res, next) => {

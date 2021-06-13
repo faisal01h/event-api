@@ -5,7 +5,11 @@ const path = require('path')
 const passport = require('passport')
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const multer = require('multer')
+const multer = require('multer');
+const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const passportJwtSocketIo = require('passport-jwt.socketio');
 const clr = require('./src/app/lib/Color');
 require('dotenv').config(); // Read .env
 
@@ -13,7 +17,6 @@ const PORT = process.env.PORT || 80;
 const MONGO_SRV = process.env.MONGO_DB_DSN || undefined;
 const secretOrKey = process.env.KEY || "confidential";
 
-const app = express();
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -44,7 +47,7 @@ const itemImgStor = multer.diskStorage({
         cb(null, './src/resources/media/item');
     },
     filename: (req, file, cb) => {
-        cb(null, "ITEM"+new Date().getTime()+"_"+file.originalname)
+        cb(null, "ITEM"+new Date().getTime()+"_"+file.originalname);
     }
 });
 
@@ -93,11 +96,24 @@ app.use((error, req, res, next) => {
     res.status(E_STATUS).json({message: E_MESSAGE, data: E_DATA});
 })
 
+//websocket
+const verifyIoAuth = (jwt_payload, done) => {
+    done(null, user);
+}
+io.use(passportJwtSocketIo.authorize({
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: secretOrKey
+}, verifyIoAuth));
+io.on('connection', (socket) => {
+    clr.info("WebSocket received a connection.");
+});
+
+
 // Database connection
 mongoose.connect(MONGO_SRV, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
     clr.success("Connected to database");
-    app.listen(PORT, ()=> clr.success("Server is running on port "+PORT));
+    server.listen(PORT, ()=> clr.success("Server is running on port "+PORT));
 })
 .catch(err => {
     clr.fail("Cannot start server\n"+err)
