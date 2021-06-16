@@ -1,6 +1,12 @@
 const { validationResult, query } = require('express-validator')
 const Item = require('../models/item')
+const Metric = require('../models/metric')
+const Telemetry = require('../models/telemetry')
 const passport = require('passport')
+require('dotenv').config();
+
+const env_metrics = process.env.METRICS || 'OFF';
+const env_telemetry = process.env.TELEMETRY || 'OFF';
 
 const clr = require('../lib/Color')
 
@@ -106,6 +112,16 @@ exports.createItem = (req, res, next) => {
         newItemListing.save()
         .then(result => {
             clr.success(new Date()+": Item "+result.id+" by "+authorId+" created", 'post')
+            const newItemMetrics = new Item({
+                itemId: result.id,
+                views: 0,
+                engagementPoints: 0
+            })
+            newItemMetrics.save()
+            .then(met_result => {
+                clr.info("Created metrics file")
+            })
+
             res.status(201).json({
                 status: 201,
                 data: {
@@ -194,6 +210,18 @@ exports.getItemsById = (req, res, next) => {
                 status: 200,
                 data: result
             })
+
+            
+            if(env_metrics === 'ON') {
+                Metric.findOneAndUpdate({ itemId: itemId }, {
+                    $inc: { 'views': 1 }
+                })
+                .then(result => {
+                    clr.info("Metrics posted")
+                })
+                clr.info("Metrics executed");
+            }
+
             clr.success(new Date()+": Served item ID "+itemId)
         }
         

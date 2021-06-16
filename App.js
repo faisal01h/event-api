@@ -106,6 +106,11 @@ io.use(passportJwtSocketIo.authorize({
 }, verifyIoAuth));
 io.on('connection', (socket) => {
     clr.info("WebSocket received a connection.");
+    socket.on("join", async room => {
+        socket.join(room);
+        io.emit("roomJoined", room);
+        clr.info("Emitted data through websocket", 'WS');
+    });
 });
 
 
