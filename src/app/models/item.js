@@ -19,6 +19,10 @@ const Item = new Schema({
         type: String,
         required: true
     },
+    jenis: {
+        type: String,
+        required: true
+    },
     description: {
         type: Object,
         required: true

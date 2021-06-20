@@ -7,6 +7,10 @@ const User = new Schema({
         type: String,
         required: true
     },
+    imageURI: {
+        type: String,
+        required: false
+    },
     email: {
         type: String,
         required: true
@@ -30,6 +34,14 @@ const User = new Schema({
     visibility: {
         type: Boolean,
         required: true
+    },
+    myEvents: {
+        type: Array,
+        required: false
+    },
+    savedEvents: {
+        type: Array,
+        required:false
     }
 
 }, {

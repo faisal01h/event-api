@@ -236,22 +236,14 @@ exports.getItemsById = (req, res, next) => {
 }
 
 exports.getFilteredItems = (req, res, next) => {
-    /*
-    req body
-    {
-        "title": string or undefined
-        "tingkatan": string or undefined
-        "daerah": string or undefined
-        "jenis": string "event"/"lomba"/"seminar" or undefined
-    }
-    */
+
     var query = {};
+    query.description = {};
     if(req.body.title) query.title = { $regex: req.body.title };
     if(req.body.tingkatan) query.tingkatan = { $regex: req.body.tingkatan };
     if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
     if(req.body.jenis) query.jenis = { $regex: req.body.jenis };
-    
-    clr.info(query);
+    if(req.body.kategori) query = {"description.kategori": req.body.kategori};
 
     Item.find(query)
     .then( result => {

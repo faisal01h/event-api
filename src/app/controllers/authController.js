@@ -53,7 +53,9 @@ exports.register = (req, res, next) => {
                             email: email,
                             password: hashedPasswd,
                             role: defaultRole,
-                            visibility: true
+                            visibility: true,
+                            myEvents: [],
+                            savedEvents: []
                         })
     
                         newUser.save()

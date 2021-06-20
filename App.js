@@ -83,10 +83,12 @@ app.use("/css", express.static(path.join(__dirname, "src/resources/css")));
 //Routes
 const itemRoutes = require('./src/app/routes/items')
 const authenticationRoutes = require('./src/app/routes/auth')
+const eventRoutes = require('./src/app/routes/event')
 
 //Routing
 app.use('/api/v1/items', itemRoutes);
 app.use('/api/v1/auth', authenticationRoutes);
+app.use('/api/v1/event', eventRoutes)
 
 // Error handling
 app.use((error, req, res, next) => {
@@ -106,6 +108,10 @@ io.use(passportJwtSocketIo.authorize({
 }, verifyIoAuth));
 io.on('connection', (socket) => {
     clr.info("WebSocket received a connection.");
+    /*
+        data flow
+        JWT.id -> after msg sent -> save to DB (userid 1, userid 2, message)
+    */
     socket.on("join", async room => {
         socket.join(room);
         io.emit("roomJoined", room);
