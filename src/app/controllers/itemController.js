@@ -238,7 +238,6 @@ exports.getItemsById = (req, res, next) => {
 exports.getFilteredItems = (req, res, next) => {
 
     var query = {};
-    query.description = {};
     if(req.body.title) query.title = { $regex: req.body.title };
     if(req.body.tingkatan) query.tingkatan = { $regex: req.body.tingkatan };
     if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
