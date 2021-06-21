@@ -1,12 +1,12 @@
 # Promotin
 
-[![Repository version](https://img.shields.io/badge/version-0.0.2-brightred)](https://github.com/faisal01h/event-api)
+[![Repository version](https://img.shields.io/badge/version-0.8.1-brightred)](https://github.com/faisal01h/event-api)
 
 ## Implementation
 
 ### API Endpoints
 - GET `<host>:<port>/api/v1/items/all` : Show all item listings
-- GET `<host>:<port>/api/v1/items/filtered` : Show filtered listings specified in request body
+- GET `<host>:<port>/api/v1/items/filter` : Show filtered listings specified in request body
 - GET `<host>:<port>/api/v1/items/paginated?page&perPage` : Shows paginated item listings
 - POST `<host>:<port>/api/v1/items/new` : Post new item with details specified in request body
 - GET `<host>:<port>/api/v1/items/view/:id` : Show item with the given ID
@@ -25,7 +25,7 @@
 {
     "id": "60a11123example"
     "title": "Example title",
-    "tingkatan": "SD;SMP;SMA;Mahasiswa;Umum;",
+    "tingkatan": "SD",
     "daerah": "Kota Surabaya, Jawa Timur;Kab. Sidoarjo, Jawa Timur;",
     "description": {
         "desc": "Example description text",
