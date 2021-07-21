@@ -243,7 +243,7 @@ exports.getFilteredItems = (req, res, next) => {
     if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
     if(req.body.jenis) query.jenis = { $regex: req.body.jenis };
     if(req.body.kategori) query = {"description.kategori": req.body.kategori};
-
+    console.log(req.body)
     Item.find(query)
     .then( result => {
         if(!result) {

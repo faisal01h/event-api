@@ -18,6 +18,8 @@ router.get('/all/visible', itemController.getAllVisibleItems)
 
 router.get('/all/filter', itemController.getFilteredItems)
 
+router.post('/all/filter', itemController.getFilteredItems)
+
 router.get('/view/:itemId', itemController.getItemsById)
 
 router.put('/view/:itemId', [body('title').isLength({max: 48, min: 8}).withMessage('Input length mismatch!'), passport.authenticate('jwt', { session: false })], itemController.updateItemById)
