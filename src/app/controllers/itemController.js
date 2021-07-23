@@ -246,6 +246,7 @@ exports.getFilteredItems = (req, res, next) => {
     if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
     if(req.body.jenis) query.jenis = { $regex: req.body.jenis };
     if(req.body.pelaksanaan) query.jenis = { $regex: req.body.pelaksanaan };
+    if(req.body.authorId) query.authorId = req.body.authorId;
     if(req.body.kategori) query = {"description.kategori": req.body.kategori};
     console.log(req.body)
     Item.find(query)
