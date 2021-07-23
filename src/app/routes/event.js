@@ -12,4 +12,6 @@ router.get('/register/check', passport.authenticate('jwt', {session:false}), eve
 
 router.post('/fav', passport.authenticate('jwt', {session:false}), eventController.eventLike)
 
+router.get('/fav', passport.authenticate('jwt', {session:false}), eventController.getLikedEvents)
+
 module.exports = router

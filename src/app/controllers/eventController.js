@@ -4,6 +4,7 @@ const Metric = require('../models/metric')
 const Telemetry = require('../models/telemetry')
 const passport = require('passport')
 const User = require('../models/user')
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const env_metrics = process.env.METRICS || 'OFF';
@@ -11,6 +12,33 @@ const env_telemetry = process.env.TELEMETRY || 'OFF';
 
 const clr = require('../lib/Color')
 const EventRegistration = require('../models/eventRegistration')
+
+exports.getLikedEvents = (req, res, next) => {
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        const userId = user.id;
+
+        User.findById(userId)
+        .then((data) => {
+            Item.find()
+            .then((liked) => {
+                let builder = [];
+                data.savedEvents.filter((e) => {
+                    liked.filter((el) => {
+                        if(e == el._id) {
+                            builder.push(el._id)
+                        }
+                            
+                        
+                    })
+                })
+                res.status(200).json({
+                    data: builder,
+                })
+            })
+            .catch(console.log)
+        })
+    }) (req, res, next)
+}
 
 exports.eventLike = (req, res, next) => {
     const eventId = req.body.itemId;
