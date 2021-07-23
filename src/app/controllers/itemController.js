@@ -242,6 +242,7 @@ exports.getFilteredItems = (req, res, next) => {
     if(req.body.tingkatan) query.tingkatan = { $regex: req.body.tingkatan };
     if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
     if(req.body.jenis) query.jenis = { $regex: req.body.jenis };
+    if(req.body.pelaksanaan) query.jenis = { $regex: req.body.pelaksanaan };
     if(req.body.kategori) query = {"description.kategori": req.body.kategori};
     console.log(req.body)
     Item.find(query)
@@ -282,6 +283,7 @@ exports.updateItemById = (req, res, next) => {
         const tingkatan = req.body.tingkatan;
         const daerah = req.body.daerah;
         const description = req.body.description;
+        const pelaksanaan = req.body.pelaksanaan;
         const itemId = req.params.itemId;
 
         
@@ -298,6 +300,7 @@ exports.updateItemById = (req, res, next) => {
                         item.title = title;
                         item.tingkatan = tingkatan;
                         item.daerah = daerah;
+                        item.pelaksanaan = pelaksanaan;
                         item.description = description;
 
                         return item.save()

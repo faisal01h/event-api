@@ -23,6 +23,10 @@ const Item = new Schema({
         type: String,
         required: true
     },
+    pelaksanaan: {
+        type: String,
+        required: true
+    },
     description: {
         type: Object,
         required: true
