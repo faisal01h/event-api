@@ -89,58 +89,59 @@ exports.createItem = (req, res, next) => {
     const daerah = req.body.daerah;
     const description = req.body.description;
     const jenis = req.body.jenis;
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
 
-    const errors = validationResult(req);
-    if(!errors.isEmpty()) {
-        clr.fail("Error on itemController:createItem", 'post')
-        const err = new Error('Invalid value');
-        err.errorStatus = 400;
-        err.data = errors.array()
-        throw err;
-    } else {
-        // All clear
-        let authorId = 1;
-        let visible = (1 === 1)
-        const newItemListing = new Item({
-            title: title,
-            tingkatan: tingkatan,
-            daerah: daerah,
-            description: description,
-            authorId: authorId,
-            jenis: jenis,
-            visibility: visible
-        })
-
-        newItemListing.save()
-        .then(result => {
-            clr.success(new Date()+": Item "+result.id+" by "+authorId+" created", 'post')
-            const newItemMetrics = new Item({
-                itemId: result.id,
-                views: 0,
-                engagementPoints: 0
-            })
-            newItemMetrics.save()
-            .then(met_result => {
-                clr.info("Created metrics file")
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            clr.fail("Error on itemController:createItem", 'post')
+            const err = new Error('Invalid value');
+            err.errorStatus = 400;
+            err.data = errors.array()
+            throw err;
+        } else {
+            // All clear
+            let visible = (1 === 1)
+            const newItemListing = new Item({
+                title: title,
+                tingkatan: tingkatan,
+                daerah: daerah,
+                description: description,
+                authorId: user.id,
+                jenis: jenis,
+                visibility: visible
             })
 
-            res.status(201).json({
-                status: 201,
-                data: {
+            newItemListing.save()
+            .then(result => {
+                clr.success(new Date()+": Item "+result.id+" by "+user.id+" created", 'post')
+                const newItemMetrics = new Item({
                     itemId: result.id,
-                    itemAuthor: authorId,
-                    itemStatus: "Posted",
-                    isItemVisible: visible
-                }
-            });
-        })
-        .catch(err => {
-            clr.fail(new Date()+": Item failed to post", 'post')
-            clr.fail(err)
-            res.status(400).json(err)
-            next()
-        })  
-    }
+                    views: 0,
+                    engagementPoints: 0
+                })
+                newItemMetrics.save()
+                .then(met_result => {
+                    clr.info("Created metrics file")
+                })
+
+                res.status(201).json({
+                    status: 201,
+                    data: {
+                        itemId: result.id,
+                        itemAuthor: user.id,
+                        itemStatus: "Posted",
+                        isItemVisible: visible
+                    }
+                });
+            })
+            .catch(err => {
+                clr.fail(new Date()+": Item failed to post", 'post')
+                clr.fail(err)
+                res.status(400).json(err)
+                next()
+            })  
+        }
+    }) (req, res, next)
 
     
 }
