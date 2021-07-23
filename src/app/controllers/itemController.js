@@ -88,6 +88,7 @@ exports.createItem = (req, res, next) => {
     const tingkatan = req.body.tingkatan;
     const daerah = req.body.daerah;
     const description = req.body.description;
+    const jenis = req.body.jenis;
 
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
@@ -106,6 +107,7 @@ exports.createItem = (req, res, next) => {
             daerah: daerah,
             description: description,
             authorId: authorId,
+            jenis: jenis,
             visibility: visible
         })
 
