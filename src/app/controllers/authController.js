@@ -194,14 +194,14 @@ exports.getUserInfo = (req, res, next) => {
             res.status(200).json({
                 status: 200,
                 data: {
-                    name: result.name,
-                    email: result.email,
-                    role: result.role,
-                    createdAt: result.createdAt,
-                    updatedAt: result.updatedAt,
-                    visibility: result.visibility,
-                    savedEvents: result.savedEvents,
-                    myEvents: result.myEvents,
+                    name: result[0].name,
+                    email: result[0].email,
+                    role: result[0].role,
+                    createdAt: result[0].createdAt,
+                    updatedAt: result[0].updatedAt,
+                    visibility: result[0].visibility,
+                    savedEvents: result[0].savedEvents,
+                    myEvents: result[0].myEvents,
                     id: result._id
                 }
             });
