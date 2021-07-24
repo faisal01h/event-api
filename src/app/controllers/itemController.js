@@ -263,7 +263,7 @@ exports.getFilteredItems = (req, res, next) => {
             res.status(200).json({
                 status: 200,
                 query: query,
-                data: result
+                data: result.reverse()
             })
             clr.success(new Date()+": Served getFilteredItems", 'get')
         }
