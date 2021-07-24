@@ -193,7 +193,17 @@ exports.getUserInfo = (req, res, next) => {
         } else {
             res.status(200).json({
                 status: 200,
-                data: result
+                data: {
+                    name: result.name,
+                    email: result.email,
+                    role: result.role,
+                    createdAt: result.createdAt,
+                    updatedAt: result.updatedAt,
+                    visibility: result.visibility,
+                    savedEvents: result.savedEvents,
+                    myEvents: result.myEvents,
+                    id: result._id
+                }
             });
         }
         
