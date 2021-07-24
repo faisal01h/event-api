@@ -202,7 +202,9 @@ exports.addImageData = (req, res, next) => {
 exports.getItemsById = (req, res, next) => {
     const itemId = req.params.itemId;
     //Item.findOne({id: itemId})
-    Item.findById(itemId)
+    Item.findByIdAndUpdate(itemId, {
+        $inc: { view: 1 }
+    })
     .then( result => {
         if(!result) {
             const err = new Error('Item not found')
@@ -210,9 +212,6 @@ exports.getItemsById = (req, res, next) => {
             throw err
         
         } else {
-            Item.findByIdAndUpdate(itemId, {
-                $inc: { 'view': 1 }
-            }).then(console.log).catch(console.error)
             res.status(200).json({
                 status: 200,
                 data: result
