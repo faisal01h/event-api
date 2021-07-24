@@ -44,19 +44,43 @@ exports.eventLike = (req, res, next) => {
     const eventId = req.body.itemId;
     passport.authenticate('jwt', {session:false}, (err, user)=> {
         const userId = user.id;
+        var found = false;
 
         Item.findById(eventId)
         .then(i_result => {
-            User.findByIdAndUpdate(userId, { $push: {savedEvents: [eventId] } })
+            User.findById(userId)
             .then(result => {
-                console.log(result);
-                
-                
-                res.status(200).json({
-                    message: "Data liked",
-                    result,
-                    query
+                result.savedEvents.find((e) => {
+                    console.log(e)
+                    if(e == eventId) {
+                        found = true;
+                        User.findByIdAndUpdate(userId, { $pull: {savedEvents: { $in: [eventId]} } })
+                        .then((re) => {
+                            clr.info("Sent unlike")
+                            res.status(200).json({
+                                message: "Data unliked",
+                                re,
+                                query
+                            })
+                            return;
+                        })
+                        .catch(console.log)
+                    }
                 })
+                console.log(found)
+                if(found === false) {
+                    clr.info("Trying to send like")
+                    User.findByIdAndUpdate(userId, { $push: {savedEvents: [eventId] } })
+                    .then((re) => {
+                        clr.info("Sent success")
+                        res.status(200).json({
+                            message: "Data liked",
+                            re,
+                            query
+                        })
+                    })
+                    .catch(console.log)
+                }
             })
             .catch(err => {
                 console.log(err);

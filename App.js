@@ -121,7 +121,7 @@ io.on('connection', (socket) => {
 
 
 // Database connection
-mongoose.connect(MONGO_SRV, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(MONGO_SRV, { useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
     clr.success("Connected to database");
     server.listen(PORT, ()=> clr.success("Server is running on port "+PORT));
