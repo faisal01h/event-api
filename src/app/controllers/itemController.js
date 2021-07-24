@@ -210,7 +210,9 @@ exports.getItemsById = (req, res, next) => {
             throw err
         
         } else {
-            result.view += 1;
+            Item.findByIdAndUpdate(itemId, {
+                $inc: { 'view': 1 }
+            }).then(console.log).catch(console.error)
             res.status(200).json({
                 status: 200,
                 data: result
