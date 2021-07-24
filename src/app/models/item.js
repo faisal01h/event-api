@@ -38,6 +38,10 @@ const Item = new Schema({
     visibility: {
         type: Boolean,
         required: true
+    },
+    view: {
+        type: Number,
+        required: true
     }
 }, {
     timestamps: true

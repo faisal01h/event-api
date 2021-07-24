@@ -108,7 +108,8 @@ exports.createItem = (req, res, next) => {
                 description: description,
                 authorId: user.id,
                 jenis: jenis,
-                visibility: visible
+                visibility: visible,
+                view: 0
             })
 
             newItemListing.save()
@@ -209,6 +210,7 @@ exports.getItemsById = (req, res, next) => {
             throw err
         
         } else {
+            result.view += 1;
             res.status(200).json({
                 status: 200,
                 data: result
@@ -241,6 +243,7 @@ exports.getItemsById = (req, res, next) => {
 exports.getFilteredItems = (req, res, next) => {
 
     var query = {};
+    query.visibility = true;
     if(req.body.title) query.title = { $regex: req.body.title, $options : 'i' };
     if(req.body.tingkatan) query.tingkatan = { $regex: req.body.tingkatan };
     if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
