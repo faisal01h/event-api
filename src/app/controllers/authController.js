@@ -1,7 +1,9 @@
 const { validationResult, query } = require('express-validator')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const PasswordReset = require('../models/passwordResets')
 const jwt = require ('jsonwebtoken')
+const mail = require('nodemailer')
 
 const clr = require('../lib/Color')
 
@@ -155,9 +157,6 @@ exports.login = (req, res, next) => {
 * @access Authorized
 */
 exports.getAllUsers = (req, res, next) => {
-    /*
-    *   TBD: Redact password from query result
-    */
     var total;
     User.countDocuments().then(result => {total = result}).catch(err => {clr.fail(err)})
     User.find()
@@ -215,4 +214,152 @@ exports.getUserInfo = (req, res, next) => {
             data: err
         })
     })
+}
+
+exports.passwordReset = (req, res, next) => {
+    const email = req.body.email;
+
+    const resetToken = Math.random().toString(16).substr(2, 8).toUpperCase();
+
+    const USERNAME = process.env.EMAIL_USERNAME
+    const PASSWORD = process.env.EMAIL_PASSWORD
+
+    User.find({ email: email })
+    .then(result => {
+        if(!result) {
+            const err = new Error('Not found');
+            err.errorStatus = 404;
+            throw err;
+        } else {
+            bcrypt.genSalt(SALTROUNDS, (err, salt) => {
+                bcrypt.hash(resetToken, salt, (err, hash) => {
+                    const hashedToken = hash;
+                    clr.info(hashedToken)
+                    console.log(result)
+        
+                    const newReset = new PasswordReset({
+                        userId: result[0]._id,
+                        email: email,
+                        tokenHash: hashedToken
+                    })
+                    newReset.save().then((response) => {
+                        const transporter = mail.createTransport({
+                            service: 'gmail',
+                            auth: {
+                              user: USERNAME,
+                              pass: PASSWORD 
+                            }
+                        })
+                    
+                        const opts = {
+                            from: USERNAME,
+                            to: email,
+                            subject: 'PromotBox: Password Reset Token',
+                            html: `\
+                            <html>\
+                            <body>\
+                                <div style="background-color: #EEEEEE; padding: 5px;"><h1>PromotBox</h1></div>\
+                                <p>Kode reset password anda adalah: </p>\
+                                <div>\
+                                <code style="font-size:3rem">${resetToken}</code>\
+                                </div>\
+                                <br>\
+                                <p>Jangan tunjukkan kode ini kepada siapapun. Pihak PromotBox tidak akan meminta kode ini.</p>\
+                            </body>\
+                            </html>\
+                            `
+                        }
+                    
+                        transporter.sendMail(opts, (error, info) => {
+                            if(error) {
+                                console.log(error)
+                            } else {
+                                console.log('Email sent: '+info.response)
+                                res.status(200).json({
+                                    info
+                                })
+                            }
+                        })
+                    }).catch(console.error)
+                })
+            })
+        
+        
+            
+        }
+        
+    })
+    .catch(err => {
+        clr.fail("Cannot find user!")
+        res.status(404).json({
+            status:404, 
+            data: err
+        })
+    })
+
+    
+}
+
+exports.processPasswordReset = (req, res, next) => {
+    const token = req.body.token;
+    const email = req.body.email;
+    const newPassword = req.body.password;
+
+    PasswordReset.findOne({ email: email })
+        .then((found) => {
+            if(!found) {
+                const err = new Error('Forbidden');
+                err.errorStatus = 403;
+                throw err;
+            } else {
+                bcrypt.compare(token, found.tokenHash)
+                .then((tokenMatch) => {
+                    if(!tokenMatch) {
+                        const err = new Error('Token mismatch');
+                        err.errorStatus = 403;
+                        throw err;
+                    } else {
+                        const data = {
+                            id: found.userId,
+                            email: found.email
+                        }
+                        res.status(200).json({
+                            data
+                        })
+
+                        bcrypt.genSalt(SALTROUNDS, (err, salt) => {
+                            bcrypt.hash(newPassword, salt, (err, hash) => {
+                                User.findByIdAndUpdate(found.userId, {
+                                    password: hash
+                                }, (err, success) => {
+                                    
+                                })
+                            })
+                        })
+
+                        clr.success(new Date()+": "+found.email+" password reset ", 'post');
+
+                        PasswordReset.deleteMany({ email: email }, (err)=>{
+                            console.log(err)
+                        })
+                    }
+                })
+                .catch(error => {
+                    clr.fail("Token mismatch", 'post')
+                    clr.fail(error)
+                    res.status(403).json({
+                        status: 403,
+                        data: error
+                    })
+                })
+            }
+        })
+        .catch(error => {
+            clr.fail("Email not found", 'post')
+            clr.fail(error)
+            res.status(403).json({
+                status: 403,
+                data: error
+            })
+        })
 }
