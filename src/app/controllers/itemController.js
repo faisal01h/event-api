@@ -89,6 +89,8 @@ exports.createItem = (req, res, next) => {
     const daerah = req.body.daerah;
     const description = req.body.description;
     const jenis = req.body.jenis;
+    const tanggal = req.body.tanggal;
+    const pelaksanaan = req.body.pelaksanaan;
     passport.authenticate('jwt', {session:false}, (err, user)=> {
 
         const errors = validationResult(req);
@@ -108,7 +110,10 @@ exports.createItem = (req, res, next) => {
                 description: description,
                 authorId: user.id,
                 jenis: jenis,
+                pelaksanaan: pelaksanaan,
+                tanggal: tanggal,
                 visibility: visible,
+                comment: [],
                 view: 0
             })
 
@@ -249,9 +254,10 @@ exports.getFilteredItems = (req, res, next) => {
     if(req.body.tingkatan) query.tingkatan = { $regex: req.body.tingkatan };
     if(req.body.daerah) query.daerah = { $regex: req.body.daerah };
     if(req.body.jenis) query.jenis = { $regex: req.body.jenis };
+    if(req.body.tanggal) query.tanggal = req.body.tanggal;
     if(req.body.pelaksanaan) query.jenis = { $regex: req.body.pelaksanaan };
     if(req.body.authorId) query.authorId = req.body.authorId;
-    if(req.body.kategori) query = {"description.kategori": req.body.kategori};
+    //if(req.body.kategori) query = {"description.kategori": req.body.kategori};
     console.log(req.body)
     Item.find(query)
     .then( result => {
@@ -291,6 +297,8 @@ exports.updateItemById = (req, res, next) => {
         const tingkatan = req.body.tingkatan;
         const daerah = req.body.daerah;
         const description = req.body.description;
+        const jenis = req.body.jenis;
+        const tanggal = req.body.tanggal;
         const pelaksanaan = req.body.pelaksanaan;
         const itemId = req.params.itemId;
 
@@ -310,6 +318,8 @@ exports.updateItemById = (req, res, next) => {
                         item.daerah = daerah;
                         item.pelaksanaan = pelaksanaan;
                         item.description = description;
+                        item.jenis = jenis;
+                        item.tanggal = tanggal;
 
                         return item.save()
                         .then(result => {
@@ -384,4 +394,77 @@ exports.removeItem = (req, res, next) => {
 
     
     
+}
+
+exports.submitComment = (req, res, next) => {
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        const payload = req.body.comment;
+        const itemId = req.body.itemId;
+
+        /*
+        * Payload schema
+        * {
+        *   userId: string,
+        *   comment: string
+        * }
+        */
+
+        Item.findById(itemId)
+        .then(item => {
+            if(!item) {
+                const err = new Error('Item not found');
+                err.errorStatus(404);
+                throw err;
+            } else {
+
+                if(payload && payload.userId && payload.comment) {
+                    payload.downvotes = 0;
+                    payload.upvotes = 0;
+                    payload.child = [];
+                    item.comment.push(payload)
+
+                    item.save()
+
+                    res.status(200).json({
+                        status: 200,
+                        itemId: itemId,
+                        message: "Replied"
+                    })
+                    clr.success(new Date()+": Replied item ID "+itemId)
+                    
+                    
+                }
+            }
+        })
+        
+        .catch(err => {
+            clr.fail("Cannot update item "+itemId, 'put')
+            clr.fail(err)
+            res.json(err)
+        })
+    }) (req, res, next)
+}
+
+exports.removeComment = (req, res, next) => {
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        
+    }) (req, res, next)
+}
+
+exports.replyComment = (req, res, next) => {
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        
+    }) (req, res, next)
+}
+
+exports.upvoteComment = (req, res, next) => {
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        
+    }) (req, res, next)
+}
+
+exports.downvoteComment = (req, res, next) => {
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        
+    }) (req, res, next)
 }

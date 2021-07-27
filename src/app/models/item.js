@@ -23,12 +23,16 @@ const Item = new Schema({
         type: String,
         required: true
     },
+    tanggal: {
+        type: Array,
+        required:true
+    },
     pelaksanaan: {
         type: String,
         required: false
     },
     description: {
-        type: Object,
+        type: String,
         required: true
     },
     authorId: {
@@ -42,6 +46,10 @@ const Item = new Schema({
     view: {
         type: Number,
         required: true
+    },
+    comment: {
+        type: Array,
+        required: false
     }
 }, {
     timestamps: true
