@@ -20,7 +20,7 @@ exports.getSeveralItems = (req, res, next) => {
     .then(result => {
         total = result;
         
-        Item.find()
+        Item.find({visibility: true})
         .skip(parseInt((currentPage-1)*perPage))
         .limit(parseInt(perPage))
         .then(result => {
