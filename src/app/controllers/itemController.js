@@ -401,14 +401,6 @@ exports.submitComment = (req, res, next) => {
         const payload = req.body.comment;
         const itemId = req.body.itemId;
 
-        /*
-        * Payload schema
-        * {
-        *   userId: string,
-        *   comment: string
-        * }
-        */
-
         Item.findById(itemId)
         .then(item => {
             if(!item) {
@@ -422,6 +414,7 @@ exports.submitComment = (req, res, next) => {
                     payload.upvotes = 0;
                     payload.child = [];
                     item.comment.push({
+                        commentId: new Date().getTime()+payload.userId,
                         userId: payload.userId,
                         comment: payload.comment
                     })
@@ -450,19 +443,21 @@ exports.submitComment = (req, res, next) => {
 
 exports.removeComment = (req, res, next) => {
     passport.authenticate('jwt', {session:false}, (err, user)=> {
-        const commentIndex = req.body.commentIndex;
+        const commentId = req.body.commentId;
         const itemId = req.params.itemId;
 
-        Item.findById(itemId)
+        Item.findByIdAndUpdate(itemId, {
+            $pull: { comment: { commentId: commentId }  }
+        })
         .then(item => {
             if(!item) {
                 const err = new Error('Item not found');
                 err.errorStatus(404);
                 throw err;
             } else {
-                if(commentIndex <= item.comment.length) {
-                    delete item.comment[commentIndex];
-                }
+                res.status(201). json({
+                    message: "Deleted!"
+                })
                
             }
         })
@@ -478,20 +473,25 @@ exports.removeComment = (req, res, next) => {
 exports.replyComment = (req, res, next) => {
     passport.authenticate('jwt', {session:false}, (err, user)=> {
         const itemId = req.params.itemId;
-        const commentIndex = req.body.index;
+        const commentId = req.body.commentId;
         const payload = {}
 
+        payload.replyId = new Date().getTime()+user.id;
         payload.userId = user.id;
         payload.comment = req.body.comment;
 
-        Item.findById(itemId)
+        Item.findByIdAndUpdate(itemId, {
+            $push: { comment : payload }
+        })
         .then(item => {
             if(!item) {
                 const err = new Error('Item not found');
                 err.errorStatus(404);
                 throw err;
             } else {
-                item.comment[commentIndex].push(payload)
+                res.status(201).json({
+                    message: "Replied!"
+                })
             }
         })
         
