@@ -176,9 +176,6 @@ exports.getAllUsers = (req, res, next) => {
 }
 
 exports.getUserInfo = (req, res, next) => {
-    /*
-    *   TBD: Redact password from query result
-    */
     var query = {}
     if(req.body._id) query._id = req.body._id;
     if(req.body.email) query.email = req.body.email;
@@ -190,6 +187,7 @@ exports.getUserInfo = (req, res, next) => {
             err.errorStatus = 404;
             throw err;
         } else {
+            result.misc.lastauth = new Date();
             res.status(200).json({
                 status: 200,
                 data: {

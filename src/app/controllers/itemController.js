@@ -421,7 +421,10 @@ exports.submitComment = (req, res, next) => {
                     payload.downvotes = 0;
                     payload.upvotes = 0;
                     payload.child = [];
-                    item.comment.push(payload)
+                    item.comment.push({
+                        userId: payload.userId,
+                        comment: payload.comment
+                    })
 
                     item.save()
 
@@ -447,12 +450,56 @@ exports.submitComment = (req, res, next) => {
 
 exports.removeComment = (req, res, next) => {
     passport.authenticate('jwt', {session:false}, (err, user)=> {
+        const commentIndex = req.body.commentIndex;
+        const itemId = req.params.itemId;
+
+        Item.findById(itemId)
+        .then(item => {
+            if(!item) {
+                const err = new Error('Item not found');
+                err.errorStatus(404);
+                throw err;
+            } else {
+                if(commentIndex <= item.comment.length) {
+                    delete item.comment[commentIndex];
+                }
+               
+            }
+        })
         
+        .catch(err => {
+            clr.fail("Cannot update item "+itemId, 'put')
+            clr.fail(err)
+            res.json(err)
+        })
     }) (req, res, next)
 }
 
 exports.replyComment = (req, res, next) => {
     passport.authenticate('jwt', {session:false}, (err, user)=> {
+        const itemId = req.params.itemId;
+        const commentIndex = req.body.index;
+        const payload = {}
+
+        payload.userId = user.id;
+        payload.comment = req.body.comment;
+
+        Item.findById(itemId)
+        .then(item => {
+            if(!item) {
+                const err = new Error('Item not found');
+                err.errorStatus(404);
+                throw err;
+            } else {
+                item.comment[commentIndex].push(payload)
+            }
+        })
+        
+        .catch(err => {
+            clr.fail("Cannot update item "+itemId, 'put')
+            clr.fail(err)
+            res.json(err)
+        })
         
     }) (req, res, next)
 }

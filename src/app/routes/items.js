@@ -26,4 +26,6 @@ router.put('/view/:itemId', [body('title').isLength({max: 48, min: 8}).withMessa
 
 router.put('/unlist/:itemId', passport.authenticate('jwt', { session: false }), itemController.removeItem)
 
+router.post('/view/:itemId/comment', passport.authenticate('jwt', { session: false }), itemController.submitComment)
+
 module.exports = router;
