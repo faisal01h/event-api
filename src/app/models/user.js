@@ -42,10 +42,6 @@ const User = new Schema({
     savedEvents: {
         type: Array,
         required:false
-    },
-    misc: {
-        type: Object,
-        required: false
     }
 
 }, {

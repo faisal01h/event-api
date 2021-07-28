@@ -187,7 +187,6 @@ exports.getUserInfo = (req, res, next) => {
             err.errorStatus = 404;
             throw err;
         } else {
-            result.misc.lastauth = new Date();
             res.status(200).json({
                 status: 200,
                 data: {
