@@ -15,6 +15,10 @@ const Item = new Schema({
         type: String,
         required: true
     },
+    kategori: {
+        type: String,
+        required: true
+    },
     daerah: {
         type: String,
         required: true

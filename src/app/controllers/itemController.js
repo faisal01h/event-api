@@ -88,6 +88,7 @@ exports.createItem = (req, res, next) => {
     const tingkatan = req.body.tingkatan;
     const daerah = req.body.daerah;
     const description = req.body.description;
+    const kategori = req.body.kategori;
     const jenis = req.body.jenis;
     const tanggal = req.body.tanggal;
     const pelaksanaan = req.body.pelaksanaan;
@@ -110,6 +111,7 @@ exports.createItem = (req, res, next) => {
                 description: description,
                 authorId: user.id,
                 jenis: jenis,
+                kategori: kategori,
                 pelaksanaan: pelaksanaan,
                 tanggal: tanggal,
                 visibility: visible,
