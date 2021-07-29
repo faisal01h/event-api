@@ -392,16 +392,8 @@ exports.removeItem = (req, res, next) => {
         if(user.role === 'admin' || user.role === 'moderator') {
             const itemId = req.params.itemId;
 
-            Item.findById(itemId)
-            .then(item => {
-                if(!item) {
-                    const err = new Error('Item not found');
-                    err.errorStatus(404);
-                    throw err;
-                } else {
-                    item.visibility = false;
-                    return item.save();
-                }
+            Item.findByIdAndUpdate(itemId, {
+                visibility: false
             })
             .then(result => {
                 res.status(200).json({
