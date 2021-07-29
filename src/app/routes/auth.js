@@ -8,7 +8,7 @@ const authenticationController = require('../controllers/authController')
 
 router.get('/user/all', authenticationController.getAllUsers)
 
-router.get('/user/find', passport.authenticate('jwt', {session:false}), authenticationController.getPublicUserInfo)
+router.get('/user/find', authenticationController.getPublicUserInfo)
 
 router.post('/user/find', passport.authenticate('jwt', {session:false}), authenticationController.getUserInfo)
 
