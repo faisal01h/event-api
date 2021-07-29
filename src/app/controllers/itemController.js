@@ -89,7 +89,7 @@ exports.createItem = (req, res, next) => {
     const daerah = req.body.daerah;
     const provinsi = req.body.provinsi;
     const kabkot = req.body.kabkot;
-    const description = req.body.description;
+    let description = req.body.description;
     const kategori = req.body.kategori;
     const jenis = req.body.jenis;
     const tanggal = req.body.tanggal;
@@ -286,6 +286,35 @@ exports.getFilteredItems = (req, res, next) => {
         clr.fail(err)
     })
 
+    
+}
+
+exports.updateSpecificItemComponentById = (req, res, next) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        clr.fail("Error on itemController:createItem", 'post')
+        const err = new Error('Invalid value');
+        err.errorStatus = 400;
+        err.data = errors.array()
+        throw err;
+    } else {
+        // All clear
+        const tanggal = req.body.tanggal;
+        let description = req.body.description;
+        const itemId = req.params.itemId;
+
+        passport.authenticate('jwt', {session:false}, (err, user)=> {
+            if(req.params.target === "tanggal" && typeof tanggal === "object" && tanggal.length > 0) {
+                Item.findByIdAndUpdate(itemId, {
+                    tanggal: tanggal
+                })
+            } else if(req.params.target === "description") {
+                Item.findByIdAndUpdate(itemId, {
+                    description: description
+                })
+            }
+        }) (req, res, next)
+    }
     
 }
 

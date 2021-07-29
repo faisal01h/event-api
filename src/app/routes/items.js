@@ -24,6 +24,8 @@ router.get('/view/:itemId', itemController.getItemsById)
 
 router.put('/view/:itemId', [body('title').isLength({max: 48, min: 8}).withMessage('Input length mismatch!'), passport.authenticate('jwt', { session: false })], itemController.updateItemById)
 
+router.patch('/view/:itemId/:target', [passport.authenticate('jwt', { session: false })], itemController.updateSpecificItemComponentById)
+
 router.put('/unlist/:itemId', passport.authenticate('jwt', { session: false }), itemController.removeItem)
 
 router.post('/view/:itemId/comment', passport.authenticate('jwt', { session: false }), itemController.submitComment)
