@@ -23,6 +23,14 @@ const Item = new Schema({
         type: String,
         required: true
     },
+    provinsi: {
+        type: String,
+        required: true
+    },
+    kabkot: {
+        type: String,
+        required: true
+    },
     jenis: {
         type: String,
         required: true
@@ -33,7 +41,7 @@ const Item = new Schema({
     },
     pelaksanaan: {
         type: String,
-        required: false
+        required: true
     },
     description: {
         type: String,

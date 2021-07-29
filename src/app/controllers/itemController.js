@@ -87,6 +87,8 @@ exports.createItem = (req, res, next) => {
     const title = req.body.title;
     const tingkatan = req.body.tingkatan;
     const daerah = req.body.daerah;
+    const provinsi = req.body.provinsi;
+    const kabkot = req.body.kabkot;
     const description = req.body.description;
     const kategori = req.body.kategori;
     const jenis = req.body.jenis;
@@ -108,6 +110,8 @@ exports.createItem = (req, res, next) => {
                 title: title,
                 tingkatan: tingkatan,
                 daerah: daerah,
+                provinsi: provinsi,
+                kabkot: kabkot,
                 description: description,
                 authorId: user.id,
                 jenis: jenis,
