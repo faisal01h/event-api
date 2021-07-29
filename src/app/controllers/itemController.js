@@ -400,8 +400,8 @@ exports.removeItem = (req, res, next) => {
 
 exports.submitComment = (req, res, next) => {
     passport.authenticate('jwt', {session:false}, (err, user)=> {
-        const payload = req.body.comment;
-        const itemId = req.body.itemId;
+        const comment = req.body.comment;
+        const itemId = req.params.itemId;
 
         Item.findById(itemId)
         .then(item => {
@@ -411,24 +411,30 @@ exports.submitComment = (req, res, next) => {
                 throw err;
             } else {
 
-                if(payload && payload.userId && payload.comment) {
-                    payload.downvotes = 0;
-                    payload.upvotes = 0;
-                    payload.child = [];
-                    item.comment.push({
-                        commentId: new Date().getTime()+payload.userId,
-                        userId: payload.userId,
-                        comment: payload.comment
+                if(comment && comment != '') {
+                    Item.findByIdAndUpdate(itemId, {
+                        $push: { comment: [{
+                            commentId: new Date().getTime()+user.id,
+                            userId: user.id,
+                            comment: comment,
+                            downvotes: [],
+                            upvotes: [],
+                            child: [],
+                            createdAt: new Date().toUTCString()
+                        }] }
                     })
-
-                    item.save()
-
-                    res.status(200).json({
-                        status: 200,
-                        itemId: itemId,
-                        message: "Replied"
+                    .then (success => {
+                        res.status(200).json({
+                            status: 200,
+                            itemId: itemId,
+                            message: "Replied"
+                        })
+                        clr.success(new Date()+": Replied item ID "+itemId)
                     })
-                    clr.success(new Date()+": Replied item ID "+itemId)
+                    .catch(console.error)
+                    
+
+                    
                     
                     
                 }
