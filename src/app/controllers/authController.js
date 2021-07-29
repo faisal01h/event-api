@@ -175,6 +175,40 @@ exports.getAllUsers = (req, res, next) => {
     })
 }
 
+exports.getPublicUserInfo = (req, res, next) => {
+    var query = {}
+    if(req.body._id) query._id = req.body._id;
+    if(req.body.email) query.email = req.body.email;
+    if(req.body.name) query.name = {$regex: req.body.name}; 
+    User.find(query)
+    .then(result => {
+        if(!result) {
+            const err = new Error('Not found');
+            err.errorStatus = 404;
+            throw err;
+        } else {
+            res.status(200).json({
+                status: 200,
+                data: {
+                    name: result[0].name,
+                    role: result[0].role,
+                    visibility: result[0].visibility,
+                    myEvents: result[0].myEvents,
+                    id: result._id
+                }
+            });
+        }
+        
+    })
+    .catch(err => {
+        clr.fail("Cannot find user!")
+        res.status(404).json({
+            status:404, 
+            data: err
+        })
+    })
+}
+
 exports.getUserInfo = (req, res, next) => {
     var query = {}
     if(req.body._id) query._id = req.body._id;
