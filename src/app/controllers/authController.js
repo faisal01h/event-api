@@ -191,7 +191,7 @@ exports.getPublicUserInfo = (req, res, next) => {
         } else {
             res.status(200).json({
                 status: 200,
-                result
+                data: result
             })
         }
         
