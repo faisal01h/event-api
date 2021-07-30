@@ -30,4 +30,8 @@ router.put('/unlist/:itemId', passport.authenticate('jwt', { session: false }), 
 
 router.post('/view/:itemId/comment', passport.authenticate('jwt', { session: false }), itemController.submitComment)
 
+router.post('/view/:itemId/comment/:commentId', passport.authenticate('jwt', { session: false }), itemController.submitCommentReply)
+
+router.post('/view/:itemId/comment/:commentId/upvote', passport.authenticate('jwt', { session: false }), itemController.upvoteComment)
+
 module.exports = router;

@@ -177,11 +177,13 @@ exports.getAllUsers = (req, res, next) => {
 
 exports.getPublicUserInfo = (req, res, next) => {
     var query = {}
-    if(req.body._id) query._id = req.body._id;
-    if(req.body.email) query.email = req.body.email;
-    if(req.body.name) query.name = {$regex: req.body.name}; 
-    User.find(query)
+    if(req.body._id) query._id = req.query._id;
+    // if(req.body.email) query.email = req.query.email;
+    // if(req.body.name) query.name = {$regex: req.query.name}; 
+    console.log(req.query._id)
+    User.findById(req.query._id)
     .then(result => {
+        console.log(result)
         if(!result) {
             const err = new Error('Not found');
             err.errorStatus = 404;
@@ -189,14 +191,8 @@ exports.getPublicUserInfo = (req, res, next) => {
         } else {
             res.status(200).json({
                 status: 200,
-                data: {
-                    name: result[0].name,
-                    role: result[0].role,
-                    visibility: result[0].visibility,
-                    myEvents: result[0].myEvents,
-                    id: result._id
-                }
-            });
+                result
+            })
         }
         
     })
@@ -350,23 +346,29 @@ exports.processPasswordReset = (req, res, next) => {
                         err.errorStatus = 403;
                         throw err;
                     } else {
-                        const data = {
-                            id: found.userId,
-                            email: found.email
-                        }
-                        res.status(200).json({
-                            data
-                        })
-
-                        bcrypt.genSalt(SALTROUNDS, (err, salt) => {
-                            bcrypt.hash(newPassword, salt, (err, hash) => {
-                                User.findByIdAndUpdate(found.userId, {
-                                    password: hash
-                                }, (err, success) => {
-                                    
+                        if(found.createdAt) {
+                            const data = {
+                                id: found.userId,
+                                email: found.email
+                            }
+                            res.status(200).json({
+                                data
+                            })
+    
+                            bcrypt.genSalt(SALTROUNDS, (err, salt) => {
+                                bcrypt.hash(newPassword, salt, (err, hash) => {
+                                    User.findByIdAndUpdate(found.userId, {
+                                        password: hash
+                                    }, (err, success) => {
+                                        
+                                    })
                                 })
                             })
-                        })
+                        } else {
+                            res.status(401).json({
+                                message: "Token expired"
+                            })
+                        }
 
                         clr.success(new Date()+": "+found.email+" password reset ", 'post');
 
