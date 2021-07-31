@@ -254,6 +254,46 @@ exports.getItemsById = (req, res, next) => {
     
 }
 
+exports.getItemComment = (req, res, next) => {
+    const itemId = req.params.itemId;
+    //Item.findOne({id: itemId})
+    Item.findById(itemId)
+    .then( result => {
+        if(!result) {
+            const err = new Error('Item not found')
+            err.errorStatus(404)
+            throw err
+        
+        } else {
+            res.status(200).json({
+                status: 200,
+                data: result.comment
+            })
+
+            
+            if(env_metrics === 'ON') {
+                Metric.findOneAndUpdate({ itemId: itemId }, {
+                    $inc: { 'views': 1 }
+                })
+                .then(result => {
+                    clr.info("Metrics posted")
+                })
+                clr.info("Metrics executed");
+            }
+
+            clr.success(new Date()+": Served item ID "+itemId)
+        }
+        
+        
+    })
+    .catch(err => {
+        clr.fail("Cannot serve item "+itemId, 'get')
+        clr.fail(err)
+    })
+
+    
+}
+
 exports.getFilteredItems = (req, res, next) => {
 
     var query = {};
