@@ -306,7 +306,7 @@ exports.getFilteredItems = (req, res, next) => {
     if(req.body.pelaksanaan) query.jenis = { $regex: req.body.pelaksanaan };
     if(req.body.authorId) query.authorId = req.body.authorId;
     //if(req.body.kategori) query = {"description.kategori": req.body.kategori};
-    console.log(req.body)
+    
     Item.find(query)
     .then( result => {
         if(!result) {
@@ -565,7 +565,7 @@ exports.submitCommentReply = (req, res, next) => {
                 throw err;
             } else {
                 for(let i = 0; i < item.comment.length; i++) {
-                    console.log('child '+i+'\n', item.comment[i].child)
+                    
                     if(item.comment[i].commentId === commentId) {
                         item.comment[i].child.push(payload)
                         target = i;
@@ -606,9 +606,9 @@ exports.upvoteComment = (req, res, next) => {
                 throw err;
             } else {
                 let found = false;
-                let target = 0;
                 for(let i = 0; i <  result.comment.length; i++) {
-                    if(result.comment[i].commentId === commentId) {
+                    console.log(commentId+': comm '+i, result.comment[i], result.comment[i].commentId == commentId)
+                    if(result.comment[i].commentId == commentId) {
                         for(let j = 0; j < result.comment[i].upvotes.length; j++) {
                             if(result.comment[i].upvotes[j] === user.id) {
                                 found = true;
@@ -617,12 +617,15 @@ exports.upvoteComment = (req, res, next) => {
                                 return result.save()
                             }
                         }
+                        if(!found) {
+                            result.comment[i].upvotes.push(user.id)
+                            result.markModified('comment')
+                            return result.save()   
+                        }
                     }
-                    target++;
                 }
-                result.comment[target].upvotes.push(user.id)
-                result.markModified('comment')
-                return result.save()                
+                return;
+                           
             }
         })
         .then((e) => {

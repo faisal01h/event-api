@@ -180,10 +180,10 @@ exports.getPublicUserInfo = (req, res, next) => {
     if(req.body._id) query._id = req.query._id;
     // if(req.body.email) query.email = req.query.email;
     // if(req.body.name) query.name = {$regex: req.query.name}; 
-    console.log(req.query._id)
+    
     User.findById(req.query._id)
     .then(result => {
-        console.log(result)
+        
         if(!result) {
             const err = new Error('Not found');
             err.errorStatus = 404;
@@ -262,7 +262,7 @@ exports.passwordReset = (req, res, next) => {
                 bcrypt.hash(resetToken, salt, (err, hash) => {
                     const hashedToken = hash;
                     clr.info(hashedToken)
-                    console.log(result)
+                    
         
                     const newReset = new PasswordReset({
                         userId: result[0]._id,
