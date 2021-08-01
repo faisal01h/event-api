@@ -606,7 +606,7 @@ exports.upvoteComment = (req, res, next) => {
                 throw err;
             } else {
                 let found = false;
-                let target = -1;
+                let target = 0;
                 for(let i = 0; i <  result.comment.length; i++) {
                     if(result.comment[i].commentId === commentId) {
                         for(let j = 0; j < result.comment[i].upvotes.length; j++) {
