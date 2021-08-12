@@ -36,4 +36,6 @@ router.post('/view/:itemId/comment/:commentId', passport.authenticate('jwt', { s
 
 router.post('/view/:itemId/comment/:commentId/upvote', passport.authenticate('jwt', { session: false }), itemController.upvoteComment)
 
+router.post('/view/:itemId/comment/:commentId/:replyId/upvote', passport.authenticate('jwt', { session: false }), itemController.upvoteReply)
+
 module.exports = router;

@@ -648,3 +648,61 @@ exports.downvoteComment = (req, res, next) => {
         
     }) (req, res, next)
 }
+
+exports.upvoteReply = (req, res, next) => {
+    const itemId = req.params.itemId
+    const commentId = req.params.commentId
+    const replyId = req.params.replyId
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        Item.findById(itemId)
+        .then((result) => {
+            if(!result) {
+                const err = new Error('Item not found');
+                err.errorStatus(404);
+                throw err;
+            } else {
+                let found = false;
+                for(let i = 0; i <  result.comment.length; i++) {
+                    console.log(commentId+': comm '+i, result.comment[i], result.comment[i].commentId == commentId)
+                    if(result.comment[i].commentId == commentId) {
+                        for(let j = 0; j < result.comment[i].child.length; j++) {
+                            if(result.comment[i].child[j].replyId == replyId) {
+                                for(let k = 0; k < result.comment[i].child[j].upvotes.length; k++) {
+
+                                    if(result.comment[i].child[j].upvotes[k] === user.id) {
+                                        found = true;
+                                        result.comment[i].child[j].upvotes.splice(k, 1)
+                                        result.markModified('comment')
+                                        return result.save()
+                                    }
+
+                                }
+
+                                if(!found) {
+                                    result.comment[i].child[j].upvotes.push(user.id)
+                                    result.markModified('comment')
+                                    return result.save()   
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+                return;
+                           
+            }
+        })
+        .then((e) => {
+            res.status(200).json({
+                data: e.comment
+            })
+        })
+        .catch((err) => {
+            clr.fail("Cannot update item "+itemId, 'put')
+            clr.fail(err)
+            res.status(404).json({
+                message: err
+            })
+        })
+    }) (req, res, next)
+}
