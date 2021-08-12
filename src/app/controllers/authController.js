@@ -346,7 +346,17 @@ exports.processPasswordReset = (req, res, next) => {
                         err.errorStatus = 403;
                         throw err;
                     } else {
-                        if(found.createdAt) {
+
+                        const generateTime = new Date(found.createdAt).getTime()
+                        const now = new Date().getTime()
+
+                        if(now - generateTime > 300000) {
+                            res.status(401).json({
+                                message: "Token expired"
+                            })
+                        } else {
+                            
+
                             const data = {
                                 id: found.userId,
                                 email: found.email
@@ -363,10 +373,6 @@ exports.processPasswordReset = (req, res, next) => {
                                         
                                     })
                                 })
-                            })
-                        } else {
-                            res.status(401).json({
-                                message: "Token expired"
                             })
                         }
 
@@ -395,4 +401,39 @@ exports.processPasswordReset = (req, res, next) => {
                 data: error
             })
         })
+}
+
+exports.changePassword = (req, res, next) => {
+    passport.authenticate('jwt', {session:false}, (err, user)=> {
+        const oldPass = req.body.oldPass
+        const newPass = req.body.newPassword
+
+        bcrypt.compare(password, oldPass)
+        .then((pwdMatch) => {
+            if(!pwdMatch) {
+                const err = new Error('Forbidden');
+                err.errorStatus = 403;
+                throw err;
+            } else {
+
+                if(oldPass !== newPass) {
+                    bcrypt.genSalt(SALTROUNDS, (err, salt) => {
+                        bcrypt.hash(newPass, salt, (err, hash) => {
+                            User.findByIdAndUpdate(user.id, {
+                                password: hash
+                            }, (err, success) => {
+                                
+                            })
+
+                            res.status(200).json({
+                                message: "Password changed!"
+                            })
+                        })
+                    })
+                }
+
+            }
+        })
+
+    }) (req, res, next)
 }

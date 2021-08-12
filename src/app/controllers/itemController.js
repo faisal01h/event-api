@@ -267,21 +267,21 @@ exports.getItemComment = (req, res, next) => {
         } else {
             res.status(200).json({
                 status: 200,
-                data: result.comment
+                data: result.comment.reverse()
             })
 
             
-            if(env_metrics === 'ON') {
-                Metric.findOneAndUpdate({ itemId: itemId }, {
-                    $inc: { 'views': 1 }
-                })
-                .then(result => {
-                    clr.info("Metrics posted")
-                })
-                clr.info("Metrics executed");
-            }
+            // if(env_metrics === 'ON') {
+            //     Metric.findOneAndUpdate({ itemId: itemId }, {
+            //         $inc: { 'views': 1 }
+            //     })
+            //     .then(result => {
+            //         clr.info("Metrics posted")
+            //     })
+            //     clr.info("Metrics executed");
+            // }
 
-            clr.success(new Date()+": Served item ID "+itemId)
+            clr.success(new Date()+": Served comment from item ID "+itemId)
         }
         
         
