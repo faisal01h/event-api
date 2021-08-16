@@ -110,6 +110,7 @@ exports.createItem = (req, res, next) => {
             let visible = (1 === 1)
             const newItemListing = new Item({
                 title: title,
+                imageURI: '',
                 tingkatan: tingkatan,
                 daerah: daerah,
                 provinsi: provinsi,
