@@ -129,7 +129,7 @@ exports.createItem = (req, res, next) => {
             newItemListing.save()
             .then(result => {
                 clr.success(new Date()+": Item "+result.id+" by "+user.id+" created", 'post')
-                const newItemMetrics = new Item({
+                const newItemMetrics = new Metric({
                     itemId: result.id,
                     views: 0,
                     engagementPoints: 0
@@ -162,18 +162,19 @@ exports.createItem = (req, res, next) => {
 }
 
 exports.addImageData = (req, res, next) => {
+    clr.info('addImageData called.')
     const itemId = req.body.itemId;
 
-    if(!req.file) {
-        clr.fail("Empty image request received on itemController:createItem", 'post')
-        const err = new Error('Bad request');
-        err.errorStatus = 400;
-        err.data = errors.array()
-        throw err;
-    }
+    // if(!req.file) {
+    //     clr.fail("Empty image request received on itemController:addImageData", 'post')
+    //     const err = new Error('Bad request');
+    //     err.errorStatus = 400;
+    //     err.data = errors.array()
+    //     throw err;
+    // }
 
     const image = req.file.path;
-
+    console.log(image)
     Item.findById(itemId)
         .then(item => {
             if(!item) {
@@ -196,6 +197,7 @@ exports.addImageData = (req, res, next) => {
                             clr.success(new Date()+": Image added on item ID "+itemId)
                             
                         })
+                        .catch(console.error)
                     } else {
                         res.status(403).json({status:403})
                         return 403;
@@ -209,7 +211,9 @@ exports.addImageData = (req, res, next) => {
         .catch(err => {
             clr.fail("Cannot update item "+itemId, 'put')
             clr.fail(err)
-            res.json(err)
+            res.status(400).json({
+                data: err
+            })
         })
 }
 

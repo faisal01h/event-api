@@ -80,6 +80,8 @@ app.use("/images", express.static(path.join(__dirname, "src/resources/media")));
 app.use("/js", express.static(path.join(__dirname, "src/resources/js")));
 app.use("/css", express.static(path.join(__dirname, "src/resources/css")));
 
+console.log('Media store path', path.join(__dirname, "src/resources/media"))
+
 //Routes
 const itemRoutes = require('./src/app/routes/items')
 const authenticationRoutes = require('./src/app/routes/auth')

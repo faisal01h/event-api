@@ -6,9 +6,9 @@ const router = express.Router()
 
 const itemController = require('../controllers/itemController')
 
-router.post('/new', passport.authenticate('jwt', {session:false}), [body('title').isLength({max: 48, min: 8}).withMessage('Input length mismatch!')], itemController.createItem)
+router.post('/new', passport.authenticate('jwt', {session:false}), [body('title').isLength({max: 48, min: 4}).withMessage('Input length mismatch!')], itemController.createItem)
 
-router.post('/new/image', passport.authenticate('jwt', {session:false}), itemController.addImageData);
+router.post('/new/image', itemController.addImageData);
 
 router.get('/paginated', itemController.getSeveralItems)
 

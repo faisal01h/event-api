@@ -143,7 +143,7 @@ exports.login = (req, res, next) => {
             }
         })
         .catch(error => {
-            clr.fail("Email not found", 'post')
+            clr.fail("Email "+email+" not found", 'post')
             clr.fail(error)
             res.status(403).json({
                 status: 403,
